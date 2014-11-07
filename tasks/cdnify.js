@@ -5,7 +5,6 @@
   Copyright 2014 Callum Locke
   Licensed under the MIT license.
 */
-
 'use strict';
 
 var path = require('path'),
@@ -23,23 +22,25 @@ function isLocalPath(filePath, mustBeRelative) {
   );
 }
 
-function joinBaseAndPath(base, urlPath) {
+function joinBaseAndPath(base, urlPath, rootAbsolutePaths) {
   if (base.indexOf('//') === -1) return base + urlPath;
 
   // Split out protocol first, to avoid '//' getting normalized to '/'
   var bits = base.split('//'),
       protocol = bits[0], rest = bits[1];
   // Trim any path off if this is a domain-relative URL
-  if (urlPath[0] === '/')
+  if (rootAbsolutePaths && urlPath[0] === '/')
     rest = rest.split('/')[0];
   // Join it all together
+
   return protocol + '//' + path.normalize("" + rest + "/" + urlPath);
 }
 
 // Default options
 var defaults = {
   html: true,
-  css: true
+  css: true,
+  rootAbsolutePaths: true
 };
 
 var htmlDefaults = {
@@ -72,7 +73,7 @@ module.exports = function (grunt) {
     if (typeof options.base === 'string') {
       rewriteURL = function (url) {
         if (isLocalPath(url))
-          return joinBaseAndPath(options.base, url);
+          return joinBaseAndPath(options.base, url, options.rootAbsolutePaths);
         return url;
       };
     }
