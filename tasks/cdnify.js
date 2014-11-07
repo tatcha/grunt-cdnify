@@ -36,11 +36,19 @@ function joinBaseAndPath(base, urlPath, rootAbsolutePaths) {
   return protocol + '//' + path.normalize("" + rest + "/" + urlPath);
 }
 
+function matchesAsset(filePath, assetSearchRoot) {
+  var searchRoots = Array.isArray(assetSearchRoot) ? assetSearchRoot : [assetSearchRoot];
+  return searchRoots.some(function(root) {
+    return path.existsSync(path.join(root, filePath));
+  });
+}
+
 // Default options
 var defaults = {
   html: true,
   css: true,
-  rootAbsolutePaths: true
+  rootAbsolutePaths: true,
+  mustBeRelative: true
 };
 
 var htmlDefaults = {
@@ -72,9 +80,11 @@ module.exports = function (grunt) {
     var rewriteURL;
     if (typeof options.base === 'string') {
       rewriteURL = function (url) {
-        if (isLocalPath(url))
-          return joinBaseAndPath(options.base, url, options.rootAbsolutePaths);
-        return url;
+        if (!isLocalPath(url, options.mustBeRelative))
+          return url;
+        if (options.ignoreMissingAssets && !matchesAsset(url, options.assetSearchRoot))
+          return url;
+        return joinBaseAndPath(options.base, url, options.rootAbsolutePaths);
       };
     }
     else if (typeof options.rewriter !== 'function') {
