@@ -38,8 +38,9 @@ function joinBaseAndPath(base, urlPath, rootAbsolutePaths) {
 
 function matchesAsset(filePath, assetSearchRoot) {
   var searchRoots = Array.isArray(assetSearchRoot) ? assetSearchRoot : [assetSearchRoot];
+  var trimmedFilePath = filePath.replace(/[?#].*$/, '');
   return searchRoots.some(function(root) {
-    return path.existsSync(path.join(root, filePath));
+    return path.existsSync(path.join(root, trimmedFilePath));
   });
 }
 
