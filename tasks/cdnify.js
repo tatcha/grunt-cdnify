@@ -8,6 +8,7 @@
 'use strict';
 
 var path = require('path'),
+    fs = require('fs'),
     Soup = require('soup'),
     rewriteCSSURLs = require('css-url-rewriter');
 
@@ -40,7 +41,7 @@ function matchesAsset(filePath, assetSearchRoot) {
   var searchRoots = Array.isArray(assetSearchRoot) ? assetSearchRoot : [assetSearchRoot];
   var trimmedFilePath = filePath.replace(/[?#].*$/, '');
   return searchRoots.some(function(root) {
-    return path.existsSync(path.join(root, trimmedFilePath));
+    return fs.existsSync(path.join(root, trimmedFilePath));
   });
 }
 
